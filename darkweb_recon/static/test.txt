@@ -1,0 +1,1 @@
+did you know any file we put is static folder is accessible by public and leads to security issues

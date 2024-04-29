@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Web Recon</title>
+</head>
+<body>
+    <h1>Dark Web Recon</h1>
+    <form method="post" action="{% url 'check_suspicious' %}">
+        {% csrf_token %}
+        <label for="url">Enter Website URL:</label><br>
+        <input type="text" id="url" name="url"><br><br>
+        <input type="submit" value="Check Suspicious">
+    </form>
+    {% if is_suspicious %}
+        <p>The website {{ url }} is found to be suspicious.</p>
+    {% else %}
+        <p>The website {{ url }} is not suspicious.</p>
+    {% endif %}
+</body>
+</html>
