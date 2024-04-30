@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from darkweb_recon.scraper import scrape_dark_web
-from darkweb_recon.data_handler import predict
+from .scraper import scrape_dark_web, parse_data
+from .data_handler import predict
 # Create your views here.
 def index(request):
     return render(request,'index.html')
@@ -18,11 +18,15 @@ def check_suspicious(request):
         scraped_file_path = scrape_dark_web(url)
 
         # Call the predict function from data_handler.py to check if the scraped data is suspicious
-        input_strings = [...]  # Define input strings from the scraped data (you need to parse the CSV file)
+        input_strings = parse_data(scraped_file_path)  # Define input strings from the scraped data (you need to parse the CSV file)
         predicted_labels = predict(input_strings)
 
         # Check if any predicted label is suspicious
-        is_suspicious = any(label in ['Drugs', 'Violence', 'Porno'] for label in predicted_labels)
+        is_suspicious = any(label in ['Drugs', 'Library Information', 'Counterfeit Products', 'Substances for Drugs', 'Services',
+                   'Services/Money', 'Accounts', 'Drugs paraphernalia', 'Cryptocurrency', 'Violence',
+                   'Counterfeit Personal-Identification', 'Leaked Data', 'Counterfeit Money', 'Counterfeit Other',
+                   'Counterfeit Credit-Cards', 'Social Network', 'Porno', 'Counterfeit Personal Identification',
+                   'Counterfeit Coupons', 'Fraud', 'Drugs Paraphernalia'] for label in predicted_labels)
 
         # Render the result template with the result
         return render(request, 'index.html', {'is_suspicious': is_suspicious, 'url': url})

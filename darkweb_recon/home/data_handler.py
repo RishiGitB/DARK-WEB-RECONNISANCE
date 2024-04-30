@@ -1,21 +1,22 @@
 from transformers import BertForSequenceClassification, BertTokenizer
 import torch
 import numpy as np
+
 CLASS_NAMES = {
-     0: 'Drugs',
-     1: 'Library Information',
-     2: 'Counterfeit Products',
-     3: 'Substances for Drugs',
-     4: 'Services',
-     5: 'Services/Money',
-     6: 'Accounts',
-     7: 'Drugs paraphernalia', 8: 'Cryptocurrency', 9: 'Violence', 10: 'Counterfeit Personal-Identification',
-     11: 'Leaked Data', 12: 'Counterfeit Money', 13: 'Counterfeit Other', 14: 'Counterfeit Credit-Cards',
-     15: 'Social Network', 16: 'Porno', 17: 'Counterfeit Personal Identification',
-     18: 'Counterfeit Coupons', 19: 'Fraud', 20: 'Drugs Paraphernalia'
+    0: 'Drugs',
+    1: 'Library Information',
+    2: 'Counterfeit Products',
+    3: 'Substances for Drugs',
+    4: 'Services',
+    5: 'Services/Money',
+    6: 'Accounts',
+    7: 'Drugs paraphernalia', 8: 'Cryptocurrency', 9: 'Violence', 10: 'Counterfeit Personal-Identification',
+    11: 'Leaked Data', 12: 'Counterfeit Money', 13: 'Counterfeit Other', 14: 'Counterfeit Credit-Cards',
+    15: 'Social Network', 16: 'Porno', 17: 'Counterfeit Personal Identification',
+    18: 'Counterfeit Coupons', 19: 'Fraud', 20: 'Drugs Paraphernalia'
 }
 
-SAVED_MODEL = "D:\cyber-security\projects\DARK WEB RECONNISANCE\HackingWebsiteMultiClassTextClassification\mchtcModel"
+SAVED_MODEL = "D:\cyber-security\projects\DARK WEB RECONNISANCE\darkweb_recon\home\mchtcModel"
 tokenizer = BertTokenizer.from_pretrained(SAVED_MODEL, do_lower_case=True)
 
 N_labels = 21
@@ -26,11 +27,7 @@ model = BertForSequenceClassification.from_pretrained(SAVED_MODEL,
 model.eval()
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model.to(device)
-
 def predict(input_strings, device="cuda" if torch.cuda.is_available() else "cpu", batch_size=32):
-    test_pred = []
-    test_loss = 0
-
     # Tokenize input strings
     tokenizer_out = tokenizer.batch_encode_plus(input_strings, padding=True, truncation=True, return_tensors="pt")
     input_ids = tokenizer_out['input_ids']
@@ -49,9 +46,9 @@ def predict(input_strings, device="cuda" if torch.cuda.is_available() else "cpu"
 
         # Get predicted labels by selecting the index with the maximum probability
         predictions = np.argmax(logits.cpu().numpy(), axis=-1)
+        predicted_labels = [CLASS_NAMES[label] for label in predictions]
 
-    return predictions
+    # Create a dictionary mapping CLASS_NAMES to predicted_labels
+    tags_predicted_labels = {tag: label for tag, label in zip(CLASS_NAMES.values(), predicted_labels)}
 
-input_strings = ["guns armoury glock", "marijuana cocaine"]
-predicted_labels = predict(input_strings)
-print([CLASS_NAMES[labels] for labels in predicted_labels])
+    return tags_predicted_labels
